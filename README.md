@@ -16,7 +16,7 @@ However, it does not...
 
 ## Local Prerequisites
 
-The content of this repository has been tested against Ansible 2.9 and 2.10. You need `ncclient` (the netconf client package) for the Juniper modules to work. To make your live easier, use Python 3 and a virtual environment for your Ansible setup:
+The content of this repository has been tested against Ansible 2.9 and 2.10. You need `ncclient` (the netconf client package) for the Juniper modules to work. To make your life easier, use Python 3 and a virtual environment for your Ansible setup:
 ```shell
 apt install python3-virtualenv
 
