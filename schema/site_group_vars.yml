@@ -1,0 +1,13 @@
+---
+
+dns_ips: list(ip(version=4))
+
+ntp_ips: list(ip(version=4))
+
+vlans: list(include("vlan"))
+
+# define include types in a separate YAML document:
+---
+vlan:
+  id: int()
+  name: str()

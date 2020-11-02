@@ -1,0 +1,34 @@
+---
+# check ospfv2
+- name: fetch ospf neighbor state
+  junos_command:
+    commands: show ospf neighbor routing-instance sipgate-public
+    display: json
+  register: ospf_state
+
+- name: Check that OSPF is running in the routing instance
+  assert:
+    that:
+      - ospf_state.stdout[0]["ospf-neighbor-information"] is defined
+    success_msg: OSPF process is running
+    fail_msg: OSPF process is not running
+    quiet: yes
+
+- name: Check that device has at least 1 ospf neighbor
+  assert:
+    that:
+      - ospf_state.stdout[0]["ospf-neighbor-information"][0]["ospf-neighbor"] is defined
+    success_msg: Device has at least 1 ospf neighbor
+    fail_msg: 'Device has 0 ospf neighbors'
+    quiet: yes
+
+- name: Check ospf neigbor state
+  assert:
+    that:
+      - item["ospf-neighbor-state"][0]["data"] in ["Full"]
+    success_msg: All ospf neighbors are in state Full
+    fail_msg: 'ospf neighbor {{ item["neighbor-id"][0]["data"] }} is not in state Full'
+    quiet: yes
+  with_items: '{{ ospf_state.stdout[0]["ospf-neighbor-information"][0]["ospf-neighbor"] }}'
+  loop_control:
+    label: 'Checked ospf neighbor {{ item["neighbor-id"][0]["data"] }}'

@@ -1,0 +1,32 @@
+---
+- hosts: edge_routers_dc_one
+  serial: 1
+  connection: local
+  gather_facts: False
+  pre_tasks:
+    - name: Test schema of host_vars
+      sipgate.yamale.yamale_validate:
+        schema_path: "schema/edge_host_vars.yml"
+        data_path: "host_vars/{{ inventory_hostname }}"
+      tags:
+        - always
+      delegate_to: localhost
+    - name: Test schema of group_vars
+      sipgate.yamale.yamale_validate:
+        schema_path: "schema/site_group_vars.yml"
+        data_path: "group_vars/dc_one"
+      tags:
+        - always
+      delegate_to: localhost
+
+  roles:
+    - role: base
+    - role: edge
+
+- hosts: edge_routers_dc_one
+  serial: 1
+  connection: local
+  gather_facts: False
+  roles:
+    - role: qa_shared
+    - role: qa_edge

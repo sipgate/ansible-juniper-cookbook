@@ -1,0 +1,27 @@
+interfaces {
+{%- for int in interfaces %}
+    replace:
+    {{ int.type|default("xe") }}-0/{{ int.fpc|default("0") }}/{{ int.id }} {
+        unit 0 {
+        {% if int.mode == "layer3" %}
+            {% if int.ip4 is defined %}
+            family inet {
+                address {{ int.ip4 }};
+            }
+            {% endif %}
+            {% if int.ip6 is defined %}
+            family inet6 {
+                address {{ int.ip6 }};
+            }
+            {% endif %}
+        {% elif int.mode == "trunk" %}
+            family ethernet-switching {
+                interface-mode trunk;
+                vlan {
+                    members [ {{ int.tagged_vlans|join(" ") }} ];
+                }
+            }
+        {% endif %}
+        }
+    }
+}

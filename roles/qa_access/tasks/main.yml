@@ -1,0 +1,49 @@
+---
+
+# virtual chassis status
+- name: fetch virtual chassis status
+  junos_command:
+    commands: show virtual-chassis
+    display: json
+  register: virtual_chassis_status
+  tags:
+    - virtual_chassis
+
+# we set a fact here to shorten the assert/that lines
+- set_fact:
+    vc_base: '{{ virtual_chassis_status.stdout[0]["virtual-chassis-information"][0]["member-list"][0]["member"] }}'
+  tags:
+    - virtual_chassis
+
+- name: Check virtual chassis status
+  assert:
+    that:
+      - (vc_base[0]["member-role"][0]["data"] == "Backup" and vc_base[1]["member-role"][0]["data"] == "Master*") or (vc_base[0]["member-role"][0]["data"] == "Master*" and vc_base[1]["member-role"][0]["data"] == "Backup")
+    success_msg: "Virtual chassis is working as expected"
+    fail_msg: "Virtual chassis error detected. Check output of 'show virtual-chassis'"
+    quiet: yes
+  tags:
+    - virtual_chassis
+
+# check if SFPs have been initialized properly
+- name: fetch uplink SFP status (show chassis hardware)
+  junos_command:
+    commands: show chassis hardware
+    display: json
+  register: chassis_hardware
+  tags:
+    - sfp_status
+
+# this is a static check to verify two specific SFPs have been detected correctly (FPC 0/1, PIC 2, Xvr 0)
+# an improved way would be to loop over all SFPs (chassis-sub-sub-module), nested in all PICs (chassis-sub-module),
+# nested in all FPCs (chassis-module).
+- name: Check uplink SFP status
+  assert:
+    that:
+      - chassis_hardware.stdout[0]["chassis-inventory"][0]["chassis"][0]["chassis-module"][2]["chassis-sub-module"][3]["chassis-sub-sub-module"][0]["description"][0]["data"] != "UNKNOWN"
+      - chassis_hardware.stdout[0]["chassis-inventory"][0]["chassis"][0]["chassis-module"][3]["chassis-sub-module"][3]["chassis-sub-sub-module"][0]["description"][0]["data"] != "UNKNOWN"
+    success_msg: "All uplink SFPs have been recognized"
+    fail_msg: "At least one uplink SFP has been detected as UNKNOWN. Check output of 'show chassis hardware'"
+    quiet: yes
+  tags:
+    - sfp_status

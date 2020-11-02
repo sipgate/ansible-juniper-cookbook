@@ -1,0 +1,9 @@
+system {
+    replace:
+    ntp {
+{% for ip in ntp_ips %}
+        server {{ ip|ipaddr('address') }};
+{% endfor %}
+    }
+    time-zone Europe/Berlin;
+}

@@ -1,0 +1,19 @@
+---
+
+dns_ips:
+  - 10.0.0.4
+  - 10.0.1.4
+
+ntp_ips:
+  - 10.0.0.5
+  - 10.0.1.5
+
+vlans:
+  - id: 100
+    name: PROD_BACKEND_SERVERS
+  - id: 200
+    name: DEV_BACKEND_SERVERS
+  - id: 300
+    name: PROD_PUBLIC_SERVERS
+  - id: 400
+    name: DEV_PUBLIC_SERVERS

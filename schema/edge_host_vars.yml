@@ -1,0 +1,5 @@
+---
+
+transit_name: str()
+transit_transfer_ip4: ip(version=4)
+transit_transfer_ip6: ip(version=6)

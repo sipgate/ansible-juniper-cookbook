@@ -1,0 +1,11 @@
+replace:
+vlans {
+{% for vlan in vlans %}
+	{{ vlan.name }} {
+		vlan-id {{ vlan.id }}
+	}	
+{% endfor %}
+    default {
+        vlan-id 1
+    }
+}

@@ -1,0 +1,18 @@
+---
+access_interfaces: list(include("interface_l3"),include("interface_trunk"))
+
+# define include types in a separate YAML document:
+---
+interface_l3:
+  type: enum("ge","xe")
+  fpc: int()
+  id: int()
+  mode: str("layer3")
+  ip4: ip(version=4)
+
+interface_trunk:
+  type: enum("ge","xe")
+  fpc: int()
+  id: int()
+  mode: str("trunk")
+  tagged_vlans: list(int())

@@ -1,0 +1,58 @@
+---
+- name: Remove leftover config preparation folder
+  file:
+    path: "/tmp/junos_config_deploy/{{ inventory_hostname }}"
+    state: absent
+  changed_when: False
+  tags:
+    - always
+
+- name: Create new config preparation folder
+  file:
+    path: "/tmp/junos_config_deploy/{{ inventory_hostname }}"
+    mode: "0700"
+    state: directory
+  changed_when: False
+  tags:
+    - always
+
+- name: Generate dns configuration
+  template:
+    src: dns.j2
+    dest: "/tmp/junos_config_deploy/{{ inventory_hostname }}/dns.conf"
+  changed_when: False
+  tags:
+    - dns
+
+- name: Generate ntp configuration
+  template:
+    src: ntp.j2
+    dest: "/tmp/junos_config_deploy/{{ inventory_hostname }}/ntp.conf"
+  changed_when: false
+  tags:
+    - ntp
+
+- name: Assemble all generated configurations
+  assemble:
+    src: "/tmp/junos_config_deploy/{{ inventory_hostname }}/"
+    dest: "/tmp/junos_config_deploy/{{ inventory_hostname }}-assembled.conf"
+  changed_when: False
+  tags:
+    - always
+
+- name: Install the assembled configuration
+  connection: netconf
+  junos_config:
+    src: "/tmp/junos_config_deploy/{{ inventory_hostname }}-assembled.conf"
+    update: replace
+    src_format: text
+  tags:
+    - always
+
+- name: Remove config preparation folder
+  file:
+    path: "/tmp/junos_config_deploy/{{ inventory_hostname }}"
+    state: absent
+  changed_when: False
+  tags:
+    - always

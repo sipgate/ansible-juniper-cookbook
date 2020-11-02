@@ -1,0 +1,14 @@
+interfaces {
+    replace:
+    xe-0/1/1 {
+        description {{ transit_name }};
+        unit 0 {
+            family inet {
+                address {{ transit_transfer_ip4 }};
+            }
+            family inet6 {
+                address {{ transit_transfer_ip6 }};
+            }
+        }
+    }
+}

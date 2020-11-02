@@ -1,0 +1,9 @@
+[dc_one:children]
+access_switches_dc_one
+edge_routers_dc_one
+
+[edge_routers_dc_one]
+edge-router01.dc-one.example.com
+
+[access_switches_dc_one]
+access-switch01.dc-one.example.com

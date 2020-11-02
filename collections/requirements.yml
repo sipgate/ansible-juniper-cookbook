@@ -1,0 +1,3 @@
+---
+collections:
+  - name: https://github.com/sipgate/ansible-module-yamale/releases/download/v1.0.1/sipgate-yamale-1.0.1.tar.gz

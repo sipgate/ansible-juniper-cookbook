@@ -1,0 +1,10 @@
+system {
+    replace:
+    name-server {
+{% for ip in dns_ips %}
+        {{ ip|ipaddr('address') }};
+{% endfor %}
+    }
+    host-name {{ inventory_hostname_short }};
+    domain-name dc-one.example.com;
+}

@@ -1,0 +1,58 @@
+---
+# system alarms
+- name: fetch system alarms
+  junos_command:
+    commands: show system alarms
+    display: json
+  register: system_alarms
+  tags: system_alarms
+
+- name: Check system alarms
+  assert:
+    that: 
+      - system_alarms.stdout[0]["alarm-information"][0]["alarm-summary"][0]["no-active-alarms"] is defined
+    success_msg: No system alarms detected
+    fail_msg: "System alarms count is not 0! Please check the ouput of 'show system alarms'"
+    quiet: yes
+  tags: system_alarms
+
+# chassis alarms
+- name: fetch chassis alarms
+  junos_command:
+    commands: show chassis alarms
+    display: json
+  register: chassis_alarms
+  tags:
+    - chassis_alarms
+
+- name: Check chassis alarms
+  assert:
+    that: 
+      - chassis_alarms.stdout[0]["alarm-information"][0]["alarm-summary"][0]["no-active-alarms"] is defined
+    success_msg: No chassis alarms detected
+    fail_msg: "Chassis alarms count is not 0! Please check the ouput of 'show chassis alarms'"
+    quiet: yes
+  tags:
+    - chassis_alarms
+
+# core dumps
+- name: fetch core-dump list
+  junos_command:
+    commands: show system core-dumps
+    display: json
+  register: core_dumps
+  tags:
+    - core_dumps
+
+- name: Check core-dump list
+  assert:
+    that:
+      - '"No such file or directory" in item["output"][0]["data"]'
+    success_msg: No core dumps have been found on the system
+    fail_msg: "We found core dumps. Please check the output of 'show system core-dumps'"
+    quiet: yes
+  with_items: '{{ core_dumps.stdout[0]["multi-routing-engine-results"][0]["multi-routing-engine-item"][0]["directory-list"] }}'
+  loop_control:
+    label: 'Checked item {{ item["attributes"]["root-path"] }}'
+  tags:
+    - core_dumps
