@@ -1,7 +1,7 @@
 interfaces {
     replace:
     xe-0/1/1 {
-        description {{ transit_name }};
+        description "{{ transit_name }}";
         unit 0 {
             family inet {
                 address {{ transit_transfer_ip4 }};
