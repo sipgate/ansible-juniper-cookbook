@@ -1,0 +1,9 @@
+---
+
+vlans:
+  - id: 100
+    name: Test-1
+  - id: 200
+    name: Test-2
+  - id: 300
+    name: Test-3

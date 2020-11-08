@@ -39,6 +39,15 @@ apt install docker.io
 pip install pytest docker
 ```
 
+You also need to build the junoser container image locally. The following command will retrieve the XSD configuration definition of the specified JunOS device (using `scp`) and build the image with it. You can optionally use the `-p` parameter to push the image to a specified docker registry, but you need to adapt the [testing code](tests/conftest.py) to reflect the image's location afterwards.
+
+```shell
+cd junoser-container
+./build-docker-container.sh -d your-junos-device.example.com
+```
+
+
+
 This repository makes use of Ansible collections. To install all dependencies, navigate to the top directory of this repository and issue:
 ```shell
 ansible-galaxy collection install -r collections/requirements.yml
@@ -121,3 +130,40 @@ We use [this Ansible module](https://github.com/sipgate/ansible-module-yamale) t
 ### Integration into Test Suites
 
 You can also use a test suite like `pytest` to run schema validation tests - the offical [documentation](https://pypi.org/project/yamale/) has code examples available.
+
+## Test Driven Template Development
+
+We can use `pytest` and the Ruby gem `junoser` to locally validate and test jinja2 templates for Juniper devices. `junoser` will do the heavy lifting in this case:
+- syntax-check the generated configuration
+- convert to JunOS `set` syntax to have a normalized view for comparing
+
+### How is this Test Driven?
+
+We can establish a workflow along these lines:
+- define/generate your configuration on a lab device (e.g. the `interfaces` block or only parts of it) and store this as the expected result
+- build a template from this configuration and add it to one of your roles
+- define sample data which can be used to render your template to the desired configuration in step 1
+- integrate the new template into the testsuite
+
+When the test passes and you need to change your configuration, follow these steps:
+- adapt your desired configuration to the new needs (and hence break the test)
+- adapt the template (and sample data) until the test passes
+
+### Structure / Assumptions / How to Use?
+
+- templates are stored as usual, e.g. `roles/${role-name}/templates/${template-name}.j2`
+- sample data goes to: `tests/${role-name}/${template-name}.yml`
+- reference/desired output goes to: `tests/${role-name}/${template-name}.conf`
+- adapt [test_templates.py](tests/test_templates.py) to pick up your new template
+- run `pytest` (or use the integrated pytest support in IDEs like PyCharm or Visual Studio Code)
+
+### How does it work underneath?
+
+The test definition in [test_templates.py](test_templates.py) runs the same procedure on all configured templates:
+- read the YAML configuration file
+- render the jinja2 template with the sample data to a temporary file
+- syntax-check the rendered file with junoser
+- convert both the rendered file and the stored reference configuration to the JunOS `set` syntax and do a string comparison
+
+If any of the above steps fails, the test for the current template will fail.
+

@@ -1,0 +1,6 @@
+#!/bin/bash
+
+file=$1
+file_tmp=/tmp/$file.tmp
+sed 's/replace://' $file > $file_tmp;
+/junoser/exe/junoser -d $file_tmp | /junoser/exe/junoser -s
