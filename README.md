@@ -20,10 +20,12 @@ The content of this repository has been tested against Ansible 2.9 and 2.10. You
 ```shell
 apt install python3-virtualenv
 
+mkdir -p ~/venv
+
 virtualenv ~/venv/ansible-netconf
 source ~/venv/ansible-netconf/bin/activate
 
-pip install ansible ncclient
+pip install ansible ncclient netaddr
 ```
 
 If you want to use YAML schema validation, we need the yamale package as well:
